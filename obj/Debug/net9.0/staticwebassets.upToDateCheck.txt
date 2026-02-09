@@ -65,6 +65,7 @@ wwwroot\uploads\14f1fa59-7399-44ae-8267-98aa1b4ed528.jpg
 wwwroot\uploads\6217bd46-1ebb-44b2-8e0a-0f4d678474c5.jpg
 wwwroot\uploads\d2c05576-64b2-4ca3-98dc-022502f02e3b.jpg
 wwwroot\uploads\f255a3ad-2bfd-495f-a8cf-dc5cea16ceb6.jpg
+wwwroot\uploads\fc81be7b-67bd-4228-b97e-c6d804620a37.jpg
 C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\wwwroot\css\site.css
 C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\wwwroot\favicon.ico
 C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\wwwroot\js\site.js
