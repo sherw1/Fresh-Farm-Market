@@ -1,0 +1,157 @@
+@page
+@model AS_Assignment2.Pages.Account.RegisterModel
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    ViewData["Title"] = "Register";
+}
+<h2>Register</h2>
+<form method="post" enctype="multipart/form-data" id="registerForm">
+    <div asp-validation-summary="All"></div>
+    <div>
+        <label asp-for="Input.FullName"></label>
+        <input asp-for="Input.FullName" />
+        <span asp-validation-for="Input.FullName"></span>
+    </div>
+    <div>
+        <label asp-for="Input.CreditCard"></label>
+        <input asp-for="Input.CreditCard" />
+        <span asp-validation-for="Input.CreditCard"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Gender"></label>
+        <select asp-for="Input.Gender">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+        <span asp-validation-for="Input.Gender"></span>
+    </div>
+    <div>
+        <label asp-for="Input.MobileNo"></label>
+        <input asp-for="Input.MobileNo" />
+        <span asp-validation-for="Input.MobileNo"></span>
+    </div>
+    <div>
+        <label asp-for="Input.DeliveryAddress"></label>
+        <input asp-for="Input.DeliveryAddress" />
+        <span asp-validation-for="Input.DeliveryAddress"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" />
+        <span asp-validation-for="Input.Email"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" type="password" id="password" />
+        <span asp-validation-for="Input.Password"></span>
+        <div id="passwordStrength" style="margin-top: 5px;"></div>
+    </div>
+    <div>
+        <label asp-for="Input.ConfirmPassword"></label>
+        <input asp-for="Input.ConfirmPassword" type="password" />
+        <span asp-validation-for="Input.ConfirmPassword"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Photo"></label>
+        <input asp-for="Input.Photo" type="file" accept=".jpg,.jpeg" />
+        <span asp-validation-for="Input.Photo"></span>
+    </div>
+    <div>
+        <label asp-for="Input.AboutMe"></label>
+        <textarea asp-for="Input.AboutMe" rows="4"></textarea>
+        <span asp-validation-for="Input.AboutMe"></span>
+    </div>
+    <input type="hidden" asp-for="Input.RecaptchaToken" id="recaptchaToken" />
+    <button type="submit" id="submitButton">Register</button>
+</form>
+
+<!-- reCAPTCHA v3 Badge Notice -->
+<div style="margin-top: 20px; font-size: 12px; color: #666;">
+    This site is protected by reCAPTCHA and the Google
+    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <!-- reCAPTCHA v3 Script - Load first -->
+    <script src="https://www.google.com/recaptcha/api.js?render=@Configuration["ReCaptcha:SiteKey"]" async defer></script>
+    
+    <script>
+        console.log('reCAPTCHA Site Key:', '@Configuration["ReCaptcha:SiteKey"]');
+        
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            var password = this.value;
+            var strengthDiv = document.getElementById('passwordStrength');
+            var strength = 0;
+            var feedback = [];
+            
+            if (password.length >= 12) strength++;
+            else feedback.push('At least 12 characters');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('lowercase letter');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('uppercase letter');
+            
+            if (/\d/.test(password)) strength++;
+            else feedback.push('number');
+            
+            if (/[!@@#$%^&*()_+=\-{}\[\]:;"'<>,.?/]/.test(password)) strength++;
+            else feedback.push('special character');
+            
+            if (strength < 3) {
+                strengthDiv.innerHTML = '<span style="color: red;">Weak - Missing: ' + feedback.join(', ') + '</span>';
+            } else if (strength < 5) {
+                strengthDiv.innerHTML = '<span style="color: orange;">Medium - Missing: ' + feedback.join(', ') + '</span>';
+            } else {
+                strengthDiv.innerHTML = '<span style="color: green;">Strong password!</span>';
+            }
+        });
+
+        // reCAPTCHA v3 - Wait for script to load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, checking for grecaptcha...');
+            
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submitted, checking grecaptcha...');
+                
+                if (typeof grecaptcha === 'undefined') {
+                    console.error('? reCAPTCHA not loaded! Check your Site Key.');
+                    alert('reCAPTCHA failed to load. Please check browser console.');
+                    return;
+                }
+                
+                console.log('? grecaptcha is available');
+                
+                grecaptcha.ready(function() {
+                    console.log('grecaptcha.ready() called');
+                    
+                    grecaptcha.execute('@Configuration["ReCaptcha:SiteKey"]', {action: 'register'})
+                        .then(function(token) {
+                            console.log('? reCAPTCHA token received:', token.substring(0, 50) + '...');
+                            document.getElementById('recaptchaToken').value = token;
+                            
+                            // Remove event listener to prevent infinite loop
+                            var form = document.getElementById('registerForm');
+                            var newForm = form.cloneNode(true);
+                            form.parentNode.replaceChild(newForm, form);
+                            
+                            // Submit the form
+                            newForm.submit();
+                        })
+                        .catch(function(error) {
+                            console.error('? reCAPTCHA error:', error);
+                            alert('reCAPTCHA verification failed. Please try again.');
+                        });
+                });
+            });
+        });
+    </script>
+}

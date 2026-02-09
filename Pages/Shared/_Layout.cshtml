@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>@ViewData["Title"] - Fresh Farm Market</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a href="/Home">My Profile</a>
+                <a href="/Account/Logout">Logout</a>
+            }
+            else
+            {
+                <a href="/Account/Login">Login</a>
+                <a href="/Account/Register">Register</a>
+            }
+        </nav>
+    </header>
+    <div>
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 - Fresh Farm Market - Secure Membership Service</p>
+    </footer>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

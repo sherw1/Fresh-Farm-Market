@@ -1,0 +1,32 @@
+@page
+@model AS_Assignment2.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+<h2>Login</h2>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" />
+        <span asp-validation-for="Input.Email"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" type="password" />
+        <span asp-validation-for="Input.Password"></span>
+    </div>
+    <button type="submit">Login</button>
+    <p><a href="/Account/Register">Don't have an account? Register</a></p>
+    <p><a href="/Account/ForgotPassword">Forgot your password?</a></p>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

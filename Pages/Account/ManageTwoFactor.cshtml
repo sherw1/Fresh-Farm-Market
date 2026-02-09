@@ -1,0 +1,71 @@
+@page
+@model AS_Assignment2.Pages.Account.ManageTwoFactorModel
+@{
+    ViewData["Title"] = "Manage Two-Factor Authentication";
+}
+
+<h2> Manage Two-Factor Authentication</h2>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div style="padding: 15px; margin-bottom: 20px; border: 1px solid; border-radius: 4px; @(Model.IsSuccess ? "background-color: #d4edda; border-color: #c3e6cb; color: #155724;" : "background-color: #f8d7da; border-color: #f5c6cb; color: #721c24;")">
+        @Model.Message
+    </div>
+}
+
+<div style="max-width: 600px;">
+    <div style="padding: 20px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 20px;">
+        <h3 style="margin-top: 0;">Current Status</h3>
+        <p style="font-size: 18px; margin-bottom: 0;">
+            Two-Factor Authentication: 
+            @if (Model.TwoFactorEnabled)
+            {
+                <strong style="color: #28a745;"> Enabled</strong>
+            }
+            else
+            {
+                <strong style="color: #dc3545;"> Disabled</strong>
+            }
+        </p>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+        <h3>What is Two-Factor Authentication?</h3>
+        <p>Two-Factor Authentication (2FA) adds an extra layer of security to your account. When enabled:</p>
+        <ul>
+            <li>You'll enter your email and password as usual</li>
+            <li>Then you'll receive a 6-digit verification code</li>
+            <li>You must enter this code to complete login</li>
+            <li>Codes expire after 10 minutes</li>
+        </ul>
+    </div>
+
+    @if (Model.TwoFactorEnabled)
+    {
+        <div style="padding: 20px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-bottom: 20px;">
+            <h4 style="margin-top: 0; color: #856404;"> 2FA is Currently Enabled</h4>
+            <p style="color: #856404; margin-bottom: 15px;">When you login next time, you'll need to enter a verification code. The code will be displayed on the 2FA page (in production, it would be sent via email).</p>
+            <form method="post" asp-page-handler="Disable" onsubmit="return confirm('Are you sure you want to disable Two-Factor Authentication? This will make your account less secure.');">
+                <button type="submit" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Disable 2FA
+                </button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div style="padding: 20px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; margin-bottom: 20px;">
+            <h4 style="margin-top: 0; color: #0c5460;"> Recommended: Enable 2FA</h4>
+            <p style="color: #0c5460; margin-bottom: 15px;">Protect your account with an extra layer of security. Even if someone knows your password, they won't be able to login without the verification code.</p>
+            <form method="post" asp-page-handler="Enable">
+                <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Enable 2FA
+                </button>
+            </form>
+        </div>
+    }
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+        <p><a href="/Home"> Back to Profile</a></p>
+    </div>
+</div>
