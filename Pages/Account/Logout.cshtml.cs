@@ -23,10 +23,9 @@ namespace AS_Assignment2.Pages.Account
             try
             {
                 var sessionId = HttpContext.Session.GetString("SessionId");
-                var email = User.Identity?.Name ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Unknown";
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-                _logger.LogInformation($"Logout requested for user: {email}, SessionId: {sessionId}");
+                _logger.LogInformation("Logout requested");
 
                 // Deactivate session in database
                 if (!string.IsNullOrEmpty(sessionId))
@@ -35,23 +34,23 @@ namespace AS_Assignment2.Pages.Account
                     if (userSession != null)
                     {
                         userSession.IsActive = false;
+                        
+                        // Log audit without email exposure
+                        var log = new AuditLog
+                        {
+                            Email = await GetUserEmailAsync(userSession.MemberId),
+                            Action = "Logout",
+                            Timestamp = DateTime.UtcNow,
+                            IsSuccess = true,
+                            IpAddress = ipAddress,
+                            Details = "User logged out"
+                        };
+                        _db.AuditLogs.Add(log);
+                        
                         await _db.SaveChangesAsync();
-                        _logger.LogInformation($"Session deactivated: {sessionId}");
+                        _logger.LogInformation("Session deactivated");
                     }
                 }
-
-                // Log audit
-                var log = new AuditLog
-                {
-                    Email = email,
-                    Action = "Logout",
-                    Timestamp = DateTime.UtcNow,
-                    IsSuccess = true,
-                    IpAddress = ipAddress,
-                    Details = "User logged out"
-                };
-                _db.AuditLogs.Add(log);
-                await _db.SaveChangesAsync();
 
                 // Sign out FIRST (before clearing session)
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -69,7 +68,7 @@ namespace AS_Assignment2.Pages.Account
                 Response.Cookies.Delete(".AspNetCore.Cookies");
                 Response.Cookies.Delete(".AspNetCore.Antiforgery");
 
-                _logger.LogInformation($"Logout completed for user: {email}, redirecting to login");
+                _logger.LogInformation("Logout completed, redirecting to login");
 
                 return RedirectToPage("/Account/Login");
             }
@@ -78,6 +77,12 @@ namespace AS_Assignment2.Pages.Account
                 _logger.LogError(ex, "Error during logout");
                 return RedirectToPage("/Account/Login");
             }
+        }
+        
+        private async Task<string> GetUserEmailAsync(int memberId)
+        {
+            var member = await _db.Members.FindAsync(memberId);
+            return member?.Email ?? "Unknown";
         }
     }
 }
