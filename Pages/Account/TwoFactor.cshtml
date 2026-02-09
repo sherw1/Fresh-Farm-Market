@@ -7,20 +7,7 @@
 <h2> Two-Factor Authentication</h2>
 <p>A verification code has been sent to your email. Please enter it below.</p>
 
-@if (!string.IsNullOrEmpty(Model.DemoCode))
-{
-    <div style="background-color: #fff3cd; border: 2px solid #ffc107; padding: 20px; margin: 20px 0; border-radius: 5px;">
-        <h3 style="color: #856404; margin-top: 0;"> Verification Code (For Demo)</h3>
-        <p style="color: #856404;"><strong>In production, this code would be sent via email/SMS.</strong></p>
-        <p style="color: #856404;">For this demo, your code is:</p>
-        <div style="background-color: white; padding: 15px; border: 2px dashed #ffc107; text-align: center; font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 5px; font-family: monospace; margin: 15px 0;">
-            @Model.DemoCode
-        </div>
-        <p style="color: #856404; font-size: 12px; margin-bottom: 0;">
-             This code expires in 10 minutes. Also check your console/terminal for the code.
-        </p>
-    </div>
-}
+
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {

@@ -75,8 +75,8 @@ namespace AS_Assignment2.Pages.Account
                     // Lock account after 3 failed attempts
                     if (member.FailedLoginAttempts >= 3)
                     {
-                        member.LockoutEndTime = DateTime.UtcNow.AddMinutes(15);
-                        ErrorMessage = "Account locked for 15 minutes due to multiple failed login attempts.";
+                        member.LockoutEndTime = DateTime.UtcNow.AddMinutes(1); // ? Changed from 15 to 1 minute
+                        ErrorMessage = "Account locked for 1 minute due to multiple failed login attempts."; // ? Updated message
                     }
                     else
                     {
@@ -122,7 +122,7 @@ namespace AS_Assignment2.Pages.Account
                 // Generate 6-digit code
                 var code = new Random().Next(100000, 999999).ToString();
                 member.TwoFactorCode = code;
-                member.TwoFactorCodeExpiry = DateTime.UtcNow.AddMinutes(10);
+                member.TwoFactorCodeExpiry = DateTime.UtcNow.AddMinutes(1); // ? Changed from 10 to 1 minute
                 await _db.SaveChangesAsync();
 
                 // Enhanced console logging for demo
@@ -186,7 +186,7 @@ namespace AS_Assignment2.Pages.Account
                 new AuthenticationProperties
                 {
                     IsPersistent = false,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(20)
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(1) // ? Changed from 20 to 1 minute
                 });
 
             HttpContext.Session.SetString("UserId", member.Id.ToString());

@@ -118,7 +118,7 @@ namespace AS_Assignment2.Pages.Account
                 new AuthenticationProperties
                 {
                     IsPersistent = false,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(20)
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(1)
                 });
 
             HttpContext.Session.SetString("UserId", member.Id.ToString());

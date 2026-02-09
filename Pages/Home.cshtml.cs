@@ -67,7 +67,7 @@ namespace AS_Assignment2.Pages
 
             // FOURTH: Check session timeout (20 minutes)
             var sessionAge = DateTime.UtcNow - userSession.LastActivityTime;
-            if (sessionAge.TotalMinutes > 20)
+            if (sessionAge.TotalMinutes > 1) // ? Changed from 20 to 1 minute
             {
                 // Session expired - deactivate and force logout
                 var sessionToDeactivate = await _db.UserSessions.FirstOrDefaultAsync(s => s.SessionId == sessionId);
@@ -106,7 +106,7 @@ namespace AS_Assignment2.Pages
             if (Member.LastPasswordChangeDate.HasValue)
             {
                 var passwordAge = DateTime.UtcNow - Member.LastPasswordChangeDate.Value;
-                if (passwordAge.TotalDays > 90)
+                if (passwordAge.TotalMinutes > 2) // ? Changed from TotalDays > 90 to TotalMinutes > 2
                 {
                     PasswordExpired = true;
                 }

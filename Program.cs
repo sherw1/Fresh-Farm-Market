@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.SlidingExpiration = true;
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(1); // ? Changed from 20 to 1 minute
         options.Cookie.HttpOnly = true;
         // Use SameAsRequest for development, Always for production
         options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
@@ -78,7 +78,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Session
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.IdleTimeout = TimeSpan.FromMinutes(1); // ? Changed from 20 to 1 minute
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 

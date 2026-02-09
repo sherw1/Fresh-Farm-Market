@@ -52,9 +52,9 @@ namespace AS_Assignment2.Middleware
                         return;
                     }
 
-                    // Check session timeout (20 minutes)
+                    // Check session timeout (2 minute)
                     var sessionAge = DateTime.UtcNow - userSession.LastActivityTime;
-                    if (sessionAge.TotalMinutes > 20)
+                    if (sessionAge.TotalMinutes > 1)
                     {
                         // Session expired - deactivate
                         var sessionToUpdate = await db.UserSessions

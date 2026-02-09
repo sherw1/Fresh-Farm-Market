@@ -29,4 +29,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Clear any logout flags when arriving at login page
+        // This ensures fresh login attempts aren't blocked
+        window.name = "";
+        sessionStorage.removeItem('loggedOut');
+        localStorage.removeItem('loggedOut');
+    </script>
 }

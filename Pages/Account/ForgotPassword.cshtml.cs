@@ -50,7 +50,7 @@ namespace AS_Assignment2.Pages.Account
                 // Generate reset token
                 var resetToken = Guid.NewGuid().ToString();
                 member.TwoFactorCode = resetToken; // Reuse field for reset token
-                member.TwoFactorCodeExpiry = DateTime.UtcNow.AddHours(1);
+                member.TwoFactorCodeExpiry = DateTime.UtcNow.AddMinutes(1); // ? Changed from AddHours(1) to AddMinutes(1)
                 await _db.SaveChangesAsync();
 
                 // Create reset link

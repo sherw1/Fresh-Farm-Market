@@ -28,13 +28,13 @@
         <p><strong>Two-Factor Authentication:</strong> 
             @if (Model.Member.TwoFactorEnabled)
             {
-                <span style="color: #28a745;">? Enabled</span>
+                <span style="color: #28a745;"> Enabled</span>
             }
             else
             {
-                <span style="color: #dc3545;">? Disabled</span>
+                <span style="color: #dc3545;"> Disabled</span>
             }
-            <a href="/Account/ManageTwoFactor" style="margin-left: 10px;">[Manage]</a>
+            
         </p>
         @if (!string.IsNullOrEmpty(Model.Member.PhotoPath))
         {
@@ -56,29 +56,34 @@ else
 @section Scripts {
     <script>
         (function() {
+            // Clear the logout flag when successfully loading Home page with authenticated user
+            // This fixes the issue where different accounts can't login after a logout
+            if (@((Model.Member != null).ToString().ToLower())) {
+                // User is authenticated and page loaded successfully
+                // Clear any logout flags
+                window.name = "";
+                sessionStorage.removeItem('loggedOut');
+                localStorage.removeItem('loggedOut');
+            }
+
             // Prevent back button after logout
             window.onpageshow = function(event) {
                 if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                    // Page loaded from cache - force reload
-                    window.location.reload();
+                    // Page loaded from cache - check if we're actually logged in
+                    if (@((Model.Member == null).ToString().ToLower())) {
+                        // Not logged in - force reload or redirect
+                        window.location.href = "/Account/Login";
+                    }
                 }
             };
 
-            // Additional check: if navigated using back/forward button
-            if (performance.navigation.type === 2) {
-                window.location.href = window.location.href;
-            }
-
-            // Prevent using browser back button
-            window.history.pushState(null, "", window.location.href);
-            window.onpopstate = function() {
+            // Prevent using browser back button only if NOT authenticated
+            if (@((Model.Member == null).ToString().ToLower())) {
                 window.history.pushState(null, "", window.location.href);
-                window.location.href = "/Account/Login";
-            };
-
-            // Check if page is being loaded from cache
-            if (window.name === "loggedOut") {
-                window.location.href = "/Account/Login";
+                window.onpopstate = function() {
+                    window.history.pushState(null, "", window.location.href);
+                    window.location.href = "/Account/Login";
+                };
             }
 
             // Set flag when leaving page via logout
@@ -86,6 +91,7 @@ else
             logoutLinks.forEach(function(link) {
                 link.addEventListener('click', function() {
                     window.name = "loggedOut";
+                    sessionStorage.setItem('loggedOut', 'true');
                 });
             });
         })();

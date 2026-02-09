@@ -86,10 +86,10 @@ namespace AS_Assignment2.Pages.Account
                 return Page();
             }
 
-            // Check minimum password age (cannot change within 5 minutes of last change)
+            // Check minimum password age (cannot change within 1 minute of last change)
             if (member.LastPasswordChangeDate.HasValue)
             {
-                var minAge = TimeSpan.FromMinutes(5);
+                var minAge = TimeSpan.FromMinutes(1); // Changed from 5 to 1 minute
                 var timeSinceLastChange = DateTime.UtcNow - member.LastPasswordChangeDate.Value;
                 if (timeSinceLastChange < minAge)
                 {

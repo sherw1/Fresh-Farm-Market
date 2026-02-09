@@ -229,3 +229,4 @@ C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\obj\Debug\net9
 C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\obj\Debug\net9.0\ref\AS_Assignment2.dll
 C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\obj\Debug\net9.0\compressed\tm12w3logd-08zsti9hjm.gz
 C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+C:\Users\names\Application Security\AS_Assignment2\AS_Assignment2\obj\Debug\net9.0\AS_Assignment2.sourcelink.json

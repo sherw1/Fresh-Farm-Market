@@ -8,32 +8,32 @@
 <form method="post" enctype="multipart/form-data" id="registerForm">
     <div asp-validation-summary="All"></div>
     <div>
-        <label asp-for="Input.FullName"></label>
+        <label asp-for="Input.FullName">Full Name</label>
         <input asp-for="Input.FullName" />
         <span asp-validation-for="Input.FullName"></span>
     </div>
     <div>
-        <label asp-for="Input.CreditCard"></label>
+        <label asp-for="Input.CreditCard">Credit Card</label>
         <input asp-for="Input.CreditCard" />
         <span asp-validation-for="Input.CreditCard"></span>
     </div>
     <div>
         <label asp-for="Input.Gender"></label>
-        <select asp-for="Input.Gender">
+        <select asp-for="Input.Gender" id="genderSelect">
             <option value="">Select Gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
         </select>
         <span asp-validation-for="Input.Gender"></span>
     </div>
     <div>
-        <label asp-for="Input.MobileNo"></label>
+        <label asp-for="Input.MobileNo">Mobile Number</label>
         <input asp-for="Input.MobileNo" />
         <span asp-validation-for="Input.MobileNo"></span>
     </div>
     <div>
-        <label asp-for="Input.DeliveryAddress"></label>
+        <label asp-for="Input.DeliveryAddress">Delivery Address</label>
         <input asp-for="Input.DeliveryAddress" />
         <span asp-validation-for="Input.DeliveryAddress"></span>
     </div>
@@ -49,7 +49,7 @@
         <div id="passwordStrength" style="margin-top: 5px;"></div>
     </div>
     <div>
-        <label asp-for="Input.ConfirmPassword"></label>
+        <label asp-for="Input.ConfirmPassword">Confirm Password</label>
         <input asp-for="Input.ConfirmPassword" type="password" />
         <span asp-validation-for="Input.ConfirmPassword"></span>
     </div>
@@ -59,7 +59,7 @@
         <span asp-validation-for="Input.Photo"></span>
     </div>
     <div>
-        <label asp-for="Input.AboutMe"></label>
+        <label asp-for="Input.AboutMe">About Me</label>
         <textarea asp-for="Input.AboutMe" rows="4"></textarea>
         <span asp-validation-for="Input.AboutMe"></span>
     </div>
@@ -114,12 +114,19 @@
             }
         });
 
-        // reCAPTCHA v3 - Wait for script to load
+        // reCAPTCHA v3 - Fixed to preserve select values during cloning
+        var formSubmitted = false;
+        
         window.addEventListener('load', function() {
             console.log('Page loaded, checking for grecaptcha...');
             
             document.getElementById('registerForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                if (formSubmitted) {
+                    return;
+                }
+                
                 console.log('Form submitted, checking grecaptcha...');
                 
                 if (typeof grecaptcha === 'undefined') {
@@ -138,17 +145,32 @@
                             console.log('? reCAPTCHA token received:', token.substring(0, 50) + '...');
                             document.getElementById('recaptchaToken').value = token;
                             
-                            // Remove event listener to prevent infinite loop
+                            // Save gender value before cloning
+                            var genderSelect = document.getElementById('genderSelect');
+                            var genderValue = genderSelect.value;
+                            console.log('Gender value before clone:', genderValue);
+                            
+                            formSubmitted = true;
+                            
+                            // Clone the form
                             var form = document.getElementById('registerForm');
                             var newForm = form.cloneNode(true);
-                            form.parentNode.replaceChild(newForm, form);
                             
-                            // Submit the form
+                            // Restore gender value after cloning
+                            var newGenderSelect = newForm.querySelector('#genderSelect');
+                            if (newGenderSelect) {
+                                newGenderSelect.value = genderValue;
+                                console.log('Gender value after clone:', newGenderSelect.value);
+                            }
+                            
+                            // Replace and submit
+                            form.parentNode.replaceChild(newForm, form);
                             newForm.submit();
                         })
                         .catch(function(error) {
                             console.error('? reCAPTCHA error:', error);
                             alert('reCAPTCHA verification failed. Please try again.');
+                            formSubmitted = false;
                         });
                 });
             });
