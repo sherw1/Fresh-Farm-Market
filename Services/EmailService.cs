@@ -16,8 +16,6 @@ namespace AS_Assignment2.Services
 
         public async Task<bool> SendTwoFactorCodeAsync(string email, string code)
         {
-            var maskedEmail = MaskEmail(email); // Mask once at the start
-            
             try
             {
                 var subject = "Your Two-Factor Authentication Code";
@@ -47,11 +45,10 @@ namespace AS_Assignment2.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to send 2FA code to {maskedEmail}");
-                // Still log to console as backup
+                // Log with sanitized email information only
+                _logger.LogError(ex, "Failed to send 2FA code");
                 Console.WriteLine($"==========================================");
                 Console.WriteLine($"?? TWO-FACTOR AUTHENTICATION CODE");
-                Console.WriteLine($"User: {maskedEmail}");
                 Console.WriteLine($"Code: {code}");
                 Console.WriteLine($"Error: {ex.Message}");
                 Console.WriteLine($"==========================================");
@@ -61,8 +58,6 @@ namespace AS_Assignment2.Services
 
         public async Task<bool> SendPasswordResetLinkAsync(string email, string resetLink)
         {
-            var maskedEmail = MaskEmail(email); // Mask once at the start
-            
             try
             {
                 var subject = "Reset Your Password - Fresh Farm Market";
@@ -101,10 +96,10 @@ namespace AS_Assignment2.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to send password reset link to {maskedEmail}");
-                // Still log to console as backup
+                // Log with sanitized information only
+                _logger.LogError(ex, "Failed to send password reset link");
                 Console.WriteLine($"==========================================");
-                Console.WriteLine($"PASSWORD RESET LINK FOR: {maskedEmail}");
+                Console.WriteLine($"PASSWORD RESET LINK SENT");
                 Console.WriteLine($"Link: {resetLink}");
                 Console.WriteLine($"Error: {ex.Message}");
                 Console.WriteLine($"==========================================");
@@ -114,8 +109,6 @@ namespace AS_Assignment2.Services
 
         private async Task<bool> SendEmailAsync(string toEmail, string subject, string body)
         {
-            var maskedToEmail = MaskEmail(toEmail); // Mask once at the start
-            
             // Get email settings from configuration
             var smtpServer = _configuration["EmailSettings:SmtpServer"];
             var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
@@ -128,8 +121,8 @@ namespace AS_Assignment2.Services
                 string.IsNullOrEmpty(senderEmail) || 
                 string.IsNullOrEmpty(senderPassword))
             {
-                _logger.LogWarning("Email settings not configured. Logging to console only.");
-                Console.WriteLine($"?? Email would be sent to: {maskedToEmail}");
+                _logger.LogWarning("Email settings not configured");
+                Console.WriteLine($"?? Email configuration missing");
                 Console.WriteLine($"Subject: {subject}");
                 return false;
             }
@@ -140,7 +133,7 @@ namespace AS_Assignment2.Services
                 {
                     EnableSsl = true,
                     Credentials = new NetworkCredential(senderEmail, senderPassword),
-                    Timeout = 10000 // 10 seconds timeout
+                    Timeout = 10000
                 };
 
                 using var message = new MailMessage
@@ -155,76 +148,21 @@ namespace AS_Assignment2.Services
 
                 await smtpClient.SendMailAsync(message);
 
-                _logger.LogInformation($"Email sent successfully to {maskedToEmail}");
-                Console.WriteLine($"? Email sent successfully to {maskedToEmail}");
+                _logger.LogInformation("Email sent successfully");
+                Console.WriteLine($"? Email sent successfully");
                 return true;
             }
             catch (SmtpException ex)
             {
-                _logger.LogError(ex, $"SMTP error sending email to {maskedToEmail}");
+                _logger.LogError(ex, "SMTP error sending email");
                 Console.WriteLine($"? SMTP Error: {ex.Message}");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error sending email to {maskedToEmail}");
+                _logger.LogError(ex, "Error sending email");
                 Console.WriteLine($"? Email Error: {ex.Message}");
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// Masks an email address for secure logging by hiding most of the local part
-        /// while preserving the domain. This prevents exposure of sensitive user data
-        /// in logs while maintaining enough information for debugging.
-        /// </summary>
-        /// <param name="email">The email address to mask</param>
-        /// <returns>Masked email address (e.g., "j***n@example.com" for "john@example.com")</returns>
-        private string MaskEmail(string email)
-        {
-            // Return as-is if null, empty, or doesn't contain @
-            if (string.IsNullOrEmpty(email) || !email.Contains('@'))
-            {
-                return email ?? string.Empty;
-            }
-
-            try
-            {
-                var parts = email.Split('@');
-                if (parts.Length != 2)
-                {
-                    return email; // Invalid format, return as-is
-                }
-
-                var localPart = parts[0];
-                var domainPart = parts[1];
-
-                // Mask the local part based on its length
-                string maskedLocal;
-                if (localPart.Length <= 1)
-                {
-                    // Single character: mask it completely
-                    maskedLocal = "*";
-                }
-                else if (localPart.Length == 2)
-                {
-                    // Two characters: show first, mask second
-                    maskedLocal = $"{localPart[0]}*";
-                }
-                else
-                {
-                    // Three or more characters: show first and last, mask middle
-                    var middleLength = localPart.Length - 2;
-                    var stars = new string('*', Math.Min(middleLength, 5)); // Max 5 stars for readability
-                    maskedLocal = $"{localPart[0]}{stars}{localPart[^1]}";
-                }
-
-                return $"{maskedLocal}@{domainPart}";
-            }
-            catch
-            {
-                // If any error occurs during masking, return a generic masked format
-                return "***@***";
             }
         }
     }
